@@ -1,0 +1,21 @@
+Martin`s thoughts on what to collect and how this would all work.
+
+Texas Hold 'Em has different "phases":
+
+Phase 1: you get your 2 own cards, no card is known on the table;
+Phase 2, Flop: reveal 3 cards on the table;
+Phase 3, Turn: reveal the 4th card on the table;
+Phase 4, River: reveal the the last card on the table.
+
+After each of these phases, everybody gets a chance to bet / call / check / fold.
+Which means we basically have at least 4 interactions per game
+(more if someone bets after you already called / checked, in which case you have to decide if you call or fold).
+
+I'd say we determine which action the bot should do by gathering separate data for each of these stages.
+Here's what information I think we'd need to collect:
+- the bot's cards (suit + number)
+- the known cards on the table (suit + number, if any)
+- the probability to win according to our poker game (this could influence the amount to bet)
+- if the bot actually would've ended up winning the game or not.
+
+Thoughts?
