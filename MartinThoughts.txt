@@ -19,3 +19,9 @@ Here's what information I think we'd need to collect:
 - if the bot actually would've ended up winning the game or not.
 
 Thoughts?
+
+***
+Nic:
+Yeah I think this makes more sense. The algorithm should be able to change it's betting pattern in the middle of a hand as you say. Now I'm just wondering if this would mean 4 different arff files (so one for every phase). Again, I need to check out how weka actually does things so I'll be trying to look at the tutorial video Scott sent later tonight. I'm only getting home at 8:30-9pm and have an early lab tomorrow so I'm not sure I'll be able to get much started before 11:30am tomorrow.
+
+Thoughts on the seperate arff files?
