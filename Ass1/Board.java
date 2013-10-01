@@ -2,8 +2,6 @@
 public class Board {	
 	private Cell[][] cells;
 	private Cell home;
-	private int homeX;
-	private int homeY;
 	private int width;
 	private int height;
 	
@@ -22,14 +20,9 @@ public class Board {
 		return home;
 	}
 	
-	public int getHomeX()
+	public boolean isHome(Cell cell)
 	{
-		return homeX;
-	}
-	
-	public int getHomeY()
-	{
-		return homeY;
+		return cell.getX() == home.getX() && cell.getY() == home.getY();
 	}
 	
 	public int getWidth()
@@ -84,7 +77,7 @@ public class Board {
 						break;
 					}
 					
-					cells[i][j] = new Cell(state);
+					cells[i][j] = new Cell(j, i, state);
 				} catch (IndexOutOfBoundsException e) {
 					throw new IllegalArgumentException("Every line of your board must be the same length.");
 				}
@@ -94,13 +87,16 @@ public class Board {
 					if (home == null)
 					{
 						home = cells[i][j];
-						homeX = j;
-						homeY = i;
 					} else {
 						throw new IllegalArgumentException("Only one HOME cell is allowed.");
 					}
 				}
 			}
+		}
+		
+		if (home == null)
+		{
+			throw new IllegalArgumentException("No HOME cell provided!");
 		}
 	}
 	

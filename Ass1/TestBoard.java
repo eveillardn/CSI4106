@@ -19,7 +19,7 @@ public class TestBoard
 		
 		Board b = new Board(s);
 		System.out.println(b);
-		System.out.println("Home: (" + b.getHomeX() + "," + b.getHomeY() + ")");
+		System.out.println("Home: (" + b.getHome().getX() + "," + b.getHome().getY() + ")");
 	}
 	
 	private static String readFile(String path) throws IOException 

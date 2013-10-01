@@ -5,16 +5,25 @@ public class Cell {
 		EMPTY, OBSTACLE, SMILEY, HOME
 	}
 	
+	private int x;
+	private int y;
 	private State currentState;
 	
-	public Cell()
+	public Cell(int x, int y, State state)
 	{
-		this(State.EMPTY);
+		this.x = x;
+		this.y = y;
+		setState(state);
 	}
 	
-	public Cell(State state)
+	public int getX()
 	{
-		setState(state);
+		return x;
+	}
+	
+	public int getY()
+	{
+		return y;
 	}
 	
 	public State getState()
