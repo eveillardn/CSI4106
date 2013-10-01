@@ -78,7 +78,7 @@
 		
 		
 		
-		return obstacles;
+		return width+length+obstacles;
 		
 		
 	}
