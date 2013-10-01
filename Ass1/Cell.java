@@ -14,11 +14,34 @@ public class Cell {
 	
 	public Cell(State state)
 	{
-		currentState = state;
+		setState(state);
 	}
 	
 	public State getState()
 	{
 		return currentState;
+	}
+	
+	public void setState(State state)
+	{
+		currentState = state;
+	}
+	
+	public String toString()
+	{
+		switch(currentState)
+		{			
+		case OBSTACLE:
+			return "O";
+			
+		case SMILEY:
+			return "S";
+			
+		case HOME:
+			return "H";
+			
+		default:
+			return " ";
+		}
 	}
 }
