@@ -1,5 +1,9 @@
-
 public class Board {	
+	public enum Neighbour
+	{
+		LEFT, RIGHT, UP, DOWN
+	}
+	
 	private Cell[][] cells;
 	private Cell home;
 	private int width;
@@ -114,6 +118,25 @@ public class Board {
 		}
 		
 		return s;
+	}
+
+	public Cell getNeighbour(Cell current, Neighbour direction)
+	{
+		if (direction == Neighbour.DOWN && current.getY() < height - 1)
+		{
+			return getCell(current.getX(), current.getY() + 1);
+		} else if (direction == Neighbour.LEFT && current.getX() > 0)
+		{
+			return getCell(current.getX() - 1, current.getY());
+		} else if (direction == Neighbour.RIGHT && current.getX() < width - 1)
+		{
+			return getCell(current.getX() + 1, current.getY());
+		} else if (direction == Neighbour.UP && current.getY() > 0)
+		{
+			return getCell(current.getX(), current.getY() - 1);
+		}
+		
+		return null;
 	}
 	
 }

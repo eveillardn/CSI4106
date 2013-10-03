@@ -3,6 +3,8 @@ import java.util.HashMap;
 
 public class AStarAss1 {
 
+	private static final boolean DEBUG = true;
+
 	public static void main(String[] args) {
 		Board board = new Board("S  O  S\n O  O  \n O  O  \n OOHO  \n  O    \n  OOO  \n     S"); //poulate board with obsticals and specified starting positions for smilies
 		solver(board);
@@ -37,85 +39,56 @@ public class AStarAss1 {
 		return path;
 	}
 	
-	private int getHeuristic(Cell c, Board b){
-		if (c.toString() =="O"){
-			return 999;
+	public static int getHeuristic(Cell c, Board b){
+		if (c.isObstacle()){
+			throw new IllegalArgumentException("Cannot calculate heuristic on an obstacle.");
 		}
 
 		Cell h = b.getHome();
-		int hx= h.getX();
-		int hy = h.getY();
 
-
-
-		int cx = c.getX();
-		int cy = c.getY();
-
-
-		int width = hx-cx;
-		int height = hy - cy;
-		int obstacles = 0;
-		//check for negative
-		if (height==0){
-			for(int i = 0; i< Math.abs(width); i++){
-				if (b.getCell(cx+i, cy).toString() =="0"){
-					obstacles++;
-				}
-			}return obstacles;
-		}
-		if (width==0){
-			for(int i = 0; i< Math.abs(height); i++){
-				if (b.getCell(cx, cy+1).toString() =="0"){
-					obstacles++;
-				}
-			}return obstacles;
-		}	
-		boolean positivex;
-		boolean positivey;
-		if (height >0){
-			positivey = true;
-		}
-		else{
-			positivey = false;
-		}
-
-		if (width >0){
-			positivex = true;
-		}
-		else{
-			positivex = false;
-		}
-
-		if (Math.abs(height) >0 && Math.abs(width) >0){
-			for (int i = 0; i<Math.abs(height); i++){
-
-				if(positivey){
-					if (b.getCell(cx, cy+i).toString() =="0"){
-						obstacles++;
+		int width = h.getX() - c.getX();
+		int height = h.getY() - c.getY();
+		int obstaclesX = 0;
+		int obstaclesY = 0;
+		
+		if (Math.abs(height) > 0) {
+			for (int i = 1; i <= Math.abs(height); i++) {
+				if (height > 0) {
+					if (b.getCell(c.getX(), c.getY() + i).isObstacle()) {
+						obstaclesY++;
 					}
 				}
-				else{
-					if (b.getCell(cx, cy-i).toString() =="0"){
-						obstacles++;
+				else {
+					if (b.getCell(c.getX(), c.getY() - i).isObstacle()) {
+						obstaclesY++;
 					}
 				}
 			}
-			for (int i = 1; i<Math.abs(height); i++){
-				if(positivex){
-
-					if (b.getCell(cx+1, cy+height).toString() =="0"){
-						obstacles++;
+		}
+		if (Math.abs(width) > 0) {
+			for (int i = 1; i <= Math.abs(width); i++){
+				if(width > 0) {
+					if (b.getCell(c.getX() + i, h.getY()).isObstacle()) {
+						obstaclesX++;
 					}
 				}
-				else{
-					if (b.getCell(cx-i,cy+height).toString() =="0"){
-						obstacles++;
+				else {
+					if (b.getCell(c.getX() - i, h.getY()).isObstacle()) {
+						obstaclesX++;
 					}
-
 				}
 			}
 		}
-		return width+height+obstacles;
+		
+		int weight = Math.abs(width) + Math.abs(height) + obstaclesX + obstaclesY;
+		
+		if (DEBUG) {
+		System.out.println("Cell (" + c.getX() + "," + c.getY() + "): " + Math.abs(height)
+				+ " vertical squares travelled with " + obstaclesY + " obstacles and " + Math.abs(width)
+				+ " horizontal squares travalled with " + obstaclesX + " obstacles. Final weight = " + weight);
+		}
+		
+		return weight;
 	}
 
 }

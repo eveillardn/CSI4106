@@ -6,6 +6,11 @@ public class TreeGenerator
 {
 	private Board board;
 	
+	public TreeGenerator(Board b)
+	{
+		board = b;
+	}
+	
 	public List<Cell> findPath(Cell start)
 	{
 		List<Cell> l = new ArrayList<Cell>();
@@ -38,7 +43,7 @@ public class TreeGenerator
 	private Node checkCell(Node node, Board.Neighbour direction)
 	{
 		Cell neighbour = board.getNeighbour(node.current, direction);
-		if (neighbour != null && neighbour.isNotObstacle() && !node.visited.contains(neighbour))
+		if (neighbour != null && !neighbour.isObstacle() && !node.visited.contains(neighbour))
 		{
 			List<Cell> visited = new ArrayList<Cell>(node.visited);
 			visited.add(neighbour);
@@ -78,8 +83,7 @@ public class TreeGenerator
 	
 	private int calculateWeight(Cell cell)
 	{
-		//TODO
-		return 0;
+		return AStarAss1.getHeuristic(cell, board);
 	}
 	
 }

@@ -3,6 +3,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class TestBoard
 {
@@ -18,8 +19,12 @@ public class TestBoard
 		}
 		
 		Board b = new Board(s);
-		System.out.println(b);
-		System.out.println("Home: (" + b.getHome().getX() + "," + b.getHome().getY() + ")");
+		TreeGenerator t = new TreeGenerator(b);
+		List<Cell> l = t.findPath(b.getCell(0, 0));
+		for (Cell c : l)
+		{
+			System.out.print("(" + c.getX() + "," + c.getY() + ") ");
+		}
 	}
 	
 	private static String readFile(String path) throws IOException 

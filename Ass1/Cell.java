@@ -53,4 +53,9 @@ public class Cell {
 			return " ";
 		}
 	}
+
+	public boolean isObstacle()
+	{
+		return currentState == State.OBSTACLE;
+	}
 }
