@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {	
 	public enum Neighbour
 	{
@@ -6,6 +9,7 @@ public class Board {
 	
 	private Cell[][] cells;
 	private Cell home;
+	private List<Cell> smileys;
 	private int width;
 	private int height;
 	
@@ -39,6 +43,11 @@ public class Board {
 		return height;
 	}
 	
+	public List<Cell> getSmileys()
+	{
+		return smileys;
+	}
+	
 	private void setCells(String input)
 	{
 		if (input.isEmpty())
@@ -51,6 +60,7 @@ public class Board {
 		height = lines[0].length();
 		cells = new Cell[width][height];
 		home = null;
+		smileys = new ArrayList<Cell>();
 		
 		Cell.State state;
 		char c;
@@ -94,6 +104,9 @@ public class Board {
 					} else {
 						throw new IllegalArgumentException("Only one HOME cell is allowed.");
 					}
+				} else if (state == Cell.State.SMILEY)
+				{
+					smileys.add(cells[i][j]);
 				}
 			}
 		}

@@ -26,6 +26,11 @@ public class Cell {
 		return y;
 	}
 	
+	public String getCoordinates()
+	{
+		return "(" + x + "," + y + ")";
+	}
+	
 	public State getState()
 	{
 		return currentState;

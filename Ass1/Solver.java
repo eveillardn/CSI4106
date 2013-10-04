@@ -2,11 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TreeGenerator
+public class Solver
 {
+	private static final boolean DEBUG = false;
+	
 	private Board board;
 	
-	public TreeGenerator(Board b)
+	public Solver(Board b)
 	{
 		board = b;
 	}
@@ -47,7 +49,7 @@ public class TreeGenerator
 		{
 			List<Cell> visited = new ArrayList<Cell>(node.visited);
 			visited.add(neighbour);
-			return new Node(node, neighbour, visited, calculateWeight(neighbour));
+			return new Node(node, neighbour, visited, getHeuristic(neighbour));
 		} else {
 			return null;
 		}
@@ -81,9 +83,58 @@ public class TreeGenerator
 		return lowestWeightedChildren;
 	}
 	
-	private int calculateWeight(Cell cell)
+	public int getHeuristic(Cell c)
 	{
-		return AStarAss1.getHeuristic(cell, board);
+		if (c.isObstacle()) {
+			throw new IllegalArgumentException("Cannot calculate heuristic on an obstacle.");
+		}
+
+		Cell h = board.getHome();
+
+		int width = h.getX() - c.getX();
+		int height = h.getY() - c.getY();
+		int obstaclesX = 0;
+		int obstaclesY = 0;
+		
+		if (height != 0) {
+			for (int i = 1; i <= Math.abs(height); i++) {
+				if (height > 0) {
+					if (board.getCell(c.getX(), c.getY() + i).isObstacle()) {
+						obstaclesY++;
+					}
+				}
+				else {
+					if (board.getCell(c.getX(), c.getY() - i).isObstacle()) {
+						obstaclesY++;
+					}
+				}
+			}
+		}
+		
+		if (width != 0) {
+			for (int i = 1; i <= Math.abs(width); i++) {
+				if (width > 0) {
+					if (board.getCell(c.getX() + i, h.getY()).isObstacle()) {
+						obstaclesX++;
+					}
+				}
+				else {
+					if (board.getCell(c.getX() - i, h.getY()).isObstacle()) {
+						obstaclesX++;
+					}
+				}
+			}
+		}
+		
+		int weight = Math.abs(width) + Math.abs(height) + obstaclesX + obstaclesY;
+		
+		if (DEBUG) {
+			System.out.println("Cell " + c.getCoordinates() + ": " + Math.abs(height)
+				+ " vertical squares travelled with " + obstaclesY + " obstacles and " + Math.abs(width)
+				+ " horizontal squares travalled with " + obstaclesX + " obstacles. Final weight = " + weight);
+		}
+		
+		return weight;
 	}
 	
 }
