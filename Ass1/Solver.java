@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This class calls the A* algorithm on a given board.
+ */
 public class Solver
 {
 	private boolean debug;
@@ -22,6 +24,9 @@ public class Solver
 		smileys = new ArrayList<Cell>(b.getSmileys());
 	}
 	
+	/**
+	 * Finds the best path to home from the given cell.
+	 */
 	public List<Cell> findPath(Cell start)
 	{
 		this.current = start;
@@ -34,8 +39,12 @@ public class Solver
 		return findPath(n);
 	}
 	
-	public List<Cell> findPath(Node n)
+	/**
+	 * Recursive call.
+	 */
+	private List<Cell> findPath(Node n)
 	{
+		// Base case: we're home, there is nothing more to visit.
 		if (n.current == board.getHome())
 		{
 			if (smileys.isEmpty())
@@ -46,20 +55,25 @@ public class Solver
 			return n.visited;
 		}
 		
+		// We look around to discover each adjacent cell.
 		n.left = checkCell(n, Board.Neighbour.LEFT);
 		n.right = checkCell(n, Board.Neighbour.RIGHT);
 		n.up = checkCell(n, Board.Neighbour.UP);
 		n.down = checkCell(n, Board.Neighbour.DOWN);
 		
+		// At this point we notify our listener(s) that the board was updated.
 		notifyListeners();
 		
+		// We get the lowest weighted children to determine which cell is next to visit.
 		Node next = getLowestWeightedChildren(n);
 		if (next == null)
 		{
+			// In the case where no cell is to be visited, we backtrack to our parent solution.
 			next = n.parent;
 			next.visited.add(n.current);
 		}
 		
+		// We update the position of the smiley on the board, if applicable
 		if (current != null && !board.isHome(current) && !smileys.contains(current))
 		{
 			current.setState(Cell.State.EMPTY);
@@ -73,6 +87,10 @@ public class Solver
 		return findPath(next);
 	}
 	
+	/**
+	 * We discover the cell next to the given current cell in the specified direction.
+	 * If it is not valid, return null.
+	 */
 	private Node checkCell(Node node, Board.Neighbour direction)
 	{
 		Cell neighbour = board.getNeighbour(node.current, direction);
@@ -86,6 +104,10 @@ public class Solver
 		}
 	}
 	
+	/**
+	 * Calculates the heuristic value for each adjacent cell
+	 * and returns the one with the lowest value, or null if none are valid.
+	 */
 	private Node getLowestWeightedChildren(Node n)
 	{
 		int lowestWeight = Integer.MAX_VALUE;
@@ -114,6 +136,9 @@ public class Solver
 		return lowestWeightedChildren;
 	}
 	
+	/**
+	 * Calculates the heuristic value for the specified cell.
+	 */
 	public int getHeuristic(Cell c)
 	{
 		if (c.isObstacle()) {
@@ -127,6 +152,7 @@ public class Solver
 		int obstaclesX = 0;
 		int obstaclesY = 0;
 		
+		// We iterate vertically to the home cell while counting obstacles.
 		if (height != 0) {
 			for (int i = 1; i <= Math.abs(height); i++) {
 				if (height > 0) {
@@ -142,6 +168,7 @@ public class Solver
 			}
 		}
 		
+		// We iterate horizontally to the home cell while counting obstacles.
 		if (width != 0) {
 			for (int i = 1; i <= Math.abs(width); i++) {
 				if (width > 0) {
@@ -159,6 +186,7 @@ public class Solver
 		
 		int weight = Math.abs(width) + Math.abs(height) + obstaclesX + obstaclesY;
 		
+		// If we're in debug mode, we print the values of the heuristic function.
 		if (debug) {
 			System.out.println("Cell " + c.getCoordinates() + ": " + Math.abs(height)
 				+ " vertical squares travelled with " + obstaclesY + " obstacles and " + Math.abs(width)
@@ -168,11 +196,17 @@ public class Solver
 		return weight;
 	}
 	
+	/**
+	 * Adds a new listener to this class.
+	 */
 	public void addListener(SolverListener l)
 	{
 		listeners.add(l);
 	}
 	
+	/**
+	 * Loops through the listeners and notifies them that the board is updated.
+	 */
 	private void notifyListeners()
 	{
 		for (SolverListener l : listeners)

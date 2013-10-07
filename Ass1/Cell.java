@@ -1,5 +1,8 @@
-
-public class Cell {
+/**
+ * This object stores a single cell of the board.
+ */
+public class Cell
+{
 	public enum State
 	{
 		EMPTY, OBSTACLE, SMILEY, HOME
@@ -16,31 +19,49 @@ public class Cell {
 		setState(state);
 	}
 	
+	/**
+	 * Returns the X coordinate of the cell.
+	 */
 	public int getX()
 	{
 		return x;
 	}
 	
+	/**
+	 * Returns the Y coordinate of the cell.
+	 */
 	public int getY()
 	{
 		return y;
 	}
 	
+	/**
+	 * Returns the coordinates of the cell as a string.
+	 */
 	public String getCoordinates()
 	{
 		return "(" + x + "," + y + ")";
 	}
 	
+	/**
+	 * Return in which state the cell currently is.
+	 */
 	public State getState()
 	{
 		return currentState;
 	}
 	
+	/**
+	 * Sets the state of the cell to the specified state.
+	 */
 	public void setState(State state)
 	{
 		currentState = state;
 	}
 	
+	/**
+	 * Converts the cell to a character matching its state.
+	 */
 	public String toString()
 	{
 		switch(currentState)
@@ -59,6 +80,9 @@ public class Cell {
 		}
 	}
 
+	/**
+	 * Returns true if the cell is an obstacle.
+	 */
 	public boolean isObstacle()
 	{
 		return currentState == State.OBSTACLE;

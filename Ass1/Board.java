@@ -1,7 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board {	
+/**
+ * This class stores the board of a maze.
+ * The cell (0,0) is the top-left most cell.
+ */
+public class Board
+{
 	public enum Neighbour
 	{
 		LEFT, RIGHT, UP, DOWN
@@ -18,36 +23,58 @@ public class Board {
 		setCells(input);
 	}
 	
+	/**
+	 * Returns cell (x,y) of the board.
+	 */
 	public Cell getCell(int x, int y)
 	{
 		return cells[y][x];
 	}
 	
+	/**
+	 * Returns the home cell of the board.
+	 */
 	public Cell getHome()
 	{
 		return home;
 	}
 	
+	/**
+	 * Checks if specified cell is the home cell of this board.
+	 */
 	public boolean isHome(Cell cell)
 	{
 		return cell.getX() == home.getX() && cell.getY() == home.getY();
 	}
 	
+	/**
+	 * Returns the width of the board.
+	 */
 	public int getWidth()
 	{
 		return width;
 	}
 	
+	/**
+	 * Returns the height of the board.
+	 */
 	public int getHeight()
 	{
 		return height;
 	}
 	
+	/**
+	 * Returns a list of all smileys on the board.
+	 */
 	public List<Cell> getSmileys()
 	{
 		return smileys;
 	}
 	
+	/**
+	 * Reads a string representation of the board and generates
+	 * an array of cells representation of that board.
+	 */
 	private void setCells(String input)
 	{
 		if (input.isEmpty())
@@ -55,6 +82,7 @@ public class Board {
 			throw new IllegalArgumentException("Empty board is not supported.");
 		}
 		
+		// Rows are newline separated.
 		String[] lines = input.split("\\r?\\n");
 		width = lines.length;
 		height = lines[0].length();
@@ -62,6 +90,7 @@ public class Board {
 		home = null;
 		smileys = new ArrayList<Cell>();
 		
+		// Loop through the string and convert individual characters to Cell objects.
 		Cell.State state;
 		char c;
 		for (int i = 0; i < width; i++)
@@ -117,6 +146,10 @@ public class Board {
 		}
 	}
 	
+	/**
+	 * Converts current board into a string using
+	 * the character equivalent of Cell objects.
+	 */
 	public String toString()
 	{
 		String s = "";
@@ -133,6 +166,10 @@ public class Board {
 		return s;
 	}
 
+	/**
+	 * Returns cell next to the given cell in the specified direction,
+	 * or null if it doesn't exist.
+	 */
 	public Cell getNeighbour(Cell current, Neighbour direction)
 	{
 		if (direction == Neighbour.DOWN && current.getY() < height - 1)

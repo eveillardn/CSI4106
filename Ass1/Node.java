@@ -1,6 +1,8 @@
 import java.util.List;
 
-
+/**
+ * This class stores a node of our solution tree.
+ */
 public class Node
 {
 	public int weight;
