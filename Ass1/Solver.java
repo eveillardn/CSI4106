@@ -4,20 +4,33 @@ import java.util.List;
 
 public class Solver
 {
-	private static final boolean DEBUG = false;
-	
+	private boolean debug;
 	private Board board;
+	private Cell current;
+	private List<Cell> smileys;
+	private List<SolverListener> listeners = new ArrayList<SolverListener>();
 	
 	public Solver(Board b)
 	{
+		this(b, false);
+	}
+	
+	public Solver(Board b, boolean d)
+	{
 		board = b;
+		debug = d;
+		smileys = new ArrayList<Cell>(b.getSmileys());
 	}
 	
 	public List<Cell> findPath(Cell start)
 	{
+		this.current = start;
+		smileys.remove(start);
+		
 		List<Cell> l = new ArrayList<Cell>();
 		l.add(start);
 		Node n = new Node(null, start, l, 0);
+		
 		return findPath(n);
 	}
 	
@@ -25,6 +38,11 @@ public class Solver
 	{
 		if (n.current == board.getHome())
 		{
+			if (smileys.isEmpty())
+			{
+				notifyListeners();
+			}
+			
 			return n.visited;
 		}
 		
@@ -33,12 +51,25 @@ public class Solver
 		n.up = checkCell(n, Board.Neighbour.UP);
 		n.down = checkCell(n, Board.Neighbour.DOWN);
 		
+		notifyListeners();
+		
 		Node next = getLowestWeightedChildren(n);
 		if (next == null)
 		{
 			next = n.parent;
 			next.visited.add(n.current);
 		}
+		
+		if (current != null && !board.isHome(current) && !smileys.contains(current))
+		{
+			current.setState(Cell.State.EMPTY);
+		}
+		current = next.current;
+		if (!board.isHome(current))
+		{
+			current.setState(Cell.State.SMILEY);
+		}
+		
 		return findPath(next);
 	}
 	
@@ -128,7 +159,7 @@ public class Solver
 		
 		int weight = Math.abs(width) + Math.abs(height) + obstaclesX + obstaclesY;
 		
-		if (DEBUG) {
+		if (debug) {
 			System.out.println("Cell " + c.getCoordinates() + ": " + Math.abs(height)
 				+ " vertical squares travelled with " + obstaclesY + " obstacles and " + Math.abs(width)
 				+ " horizontal squares travalled with " + obstaclesX + " obstacles. Final weight = " + weight);
@@ -137,4 +168,16 @@ public class Solver
 		return weight;
 	}
 	
+	public void addListener(SolverListener l)
+	{
+		listeners.add(l);
+	}
+	
+	private void notifyListeners()
+	{
+		for (SolverListener l : listeners)
+		{
+			l.boardUpdated();
+		}
+	}
 }
