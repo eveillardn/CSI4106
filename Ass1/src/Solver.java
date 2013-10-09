@@ -132,7 +132,7 @@ public class Solver
 				nodes[neighbour.getX()][neighbour.getY()].parent = node;
 				int newWeight = nodes[neighbour.getX()][neighbour.getY()].getWeight();
 				
-				if (previousWeight < newWeight)
+				if (previousWeight <= newWeight)
 				{
 					nodes[neighbour.getX()][neighbour.getY()].parent = previousParent;
 				}

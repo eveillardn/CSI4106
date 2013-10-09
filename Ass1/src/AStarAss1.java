@@ -31,6 +31,13 @@ public class AStarAss1 extends JFrame implements SolverListener
 	private static final boolean DEBUG = false;
 	
 	/**
+	 * Centers the coordinates around home.
+	 * That would mean the home has coordinates of (0,0)
+	 * and the top-left cell has coordinates of (-width/2, height/2).
+	 */
+	private static final boolean CENTER_COORDINATES_ON_HOME = true;
+	
+	/**
 	 * Specifies the delay between each move for the GUI representation
 	 * of the solutions, in milliseconds.
 	 */
@@ -77,7 +84,7 @@ public class AStarAss1 extends JFrame implements SolverListener
 		
 		// We loop through the smileys and print their solutions.
 		List<Integer> winners = new ArrayList<Integer>();
-		int steps, minSteps = Integer.MAX_VALUE;
+		int x, y, steps, minSteps = Integer.MAX_VALUE;
 		Cell smiley;
 		List<Cell> path;
 		for (int i = 0; i < smileys.size(); i++)
@@ -99,7 +106,16 @@ public class AStarAss1 extends JFrame implements SolverListener
 			System.out.print("Smiley #" + (i+1) + ": ");
 			for (Cell c : path)
 			{
-				System.out.print(c.getCoordinates() + " ");
+				x = c.getX();
+				y = c.getY();
+				
+				if (CENTER_COORDINATES_ON_HOME)
+				{
+					x -= board.getHome().getX();
+					y = -1 * y + board.getHome().getY();
+				}
+				
+				System.out.print("(" + x + " " + y + ") ");
 			}
 			System.out.println(steps + " steps");
 		}
