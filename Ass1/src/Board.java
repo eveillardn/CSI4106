@@ -28,7 +28,7 @@ public class Board
 	 */
 	public Cell getCell(int x, int y)
 	{
-		return cells[y][x];
+		return cells[x][y];
 	}
 	
 	/**
@@ -84,8 +84,8 @@ public class Board
 		
 		// Rows are newline separated.
 		String[] lines = input.split("\\r?\\n");
-		width = lines.length;
-		height = lines[0].length();
+		height = lines.length;
+		width = lines[0].length();
 		cells = new Cell[width][height];
 		home = null;
 		smileys = new ArrayList<Cell>();
@@ -93,13 +93,13 @@ public class Board
 		// Loop through the string and convert individual characters to Cell objects.
 		Cell.State state;
 		char c;
-		for (int i = 0; i < width; i++)
+		for (int y = 0; y < height; y++)
 		{
-			for (int j = 0; j < height; j++)
+			for (int x = 0; x < width; x++)
 			{
 				try
 				{
-					c = lines[i].charAt(j);
+					c = lines[y].charAt(x);
 
 					switch(c)
 					{
@@ -120,7 +120,7 @@ public class Board
 						break;
 					}
 					
-					cells[i][j] = new Cell(j, i, state);
+					cells[x][y] = new Cell(x, y, state);
 				} catch (IndexOutOfBoundsException e) {
 					throw new IllegalArgumentException("Every line of your board must be the same length.");
 				}
@@ -129,13 +129,13 @@ public class Board
 				{
 					if (home == null)
 					{
-						home = cells[i][j];
+						home = cells[x][y];
 					} else {
 						throw new IllegalArgumentException("Only one HOME cell is allowed.");
 					}
 				} else if (state == Cell.State.SMILEY)
 				{
-					smileys.add(cells[i][j]);
+					smileys.add(cells[x][y]);
 				}
 			}
 		}
@@ -154,11 +154,11 @@ public class Board
 	{
 		String s = "";
 		
-		for (int i = 0; i < width; i++)
+		for (int y = 0; y < height; y++)
 		{
-			for (int j = 0; j < height; j++)
+			for (int x = 0; x < width; x++)
 			{
-				s += cells[i][j].toString();
+				s += cells[x][y].toString();
 			}
 			s += "\n";
 		}
