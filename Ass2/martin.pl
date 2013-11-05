@@ -47,12 +47,16 @@ findPath(A, B, Path, Distance) :-
 append([], L, L).
 append([H | T], L2, [H | L]) :- append(T, L2, L).
 
-generate(S, Towns, Solution, Distance, Time, Cost) :- findPath(S, S, Path, Distance), submember(Towns, Path), getTimeAndCost(Path, [], S1, 0, 0, Time, Cost),
-	setof([S1, Distance, T1, C1], getTimeAndCost(Path, [], S1, 0, 0, T1, C1), Set), fastest(Set, Solution).
-fastest([H | T], Solution) :- fastest(T, H, Solution).
-fastest([[S1, D1, T1, C1] | T], [_, _, FastestTime, _], Solution) :- T1 < FastestTime, !, fastest(T, [S1, D1, T1, C1], Solution).
-fastest([_ | T], Fastest, Solution) :- fastest(T, Fastest, Solution).
-fastest([], Solution, Solution).
+generate(S, Towns, Set, Distance, Time, Cost) :- findPath(S, S, Path, Distance), submember(Towns, Path), getTimeAndCost(Path, [], S1, 0, 0, Time, Cost),
+	setof([S1, Distance, T1, C1], getTimeAndCost(Path, [], S1, 0, 0, T1, C1), Set).
+
+generateCheapest(S, Towns, Solution, Distance, Time, Cost, MaxCost) :- generate(S, Towns, Set, Distance, Time, Cost), cheapest(Set, MaxCost, Solution).
+cheapest([[Sol, Dis, Time, Cost] | _], MaxCost, [Sol, Dis, Time, Cost]) :- Cost < MaxCost, !.
+cheapest([_ | Tail], MaxCost, Solution) :- cheapest(Tail, MaxCost, Solution).
+
+generateFastest(S, Towns, Solution, Distance, Time, Cost, MaxTime) :- generate(S, Towns, Set, Distance, Time, Cost), fastest(Set, MaxTime, Solution).
+fastest([[Sol, Dis, Time, Cost] | _], MaxTime, [Sol, Dis, Time, Cost]) :- Time < MaxTime, !.
+fastest([_ | Tail], MaxTime, Solution) :- fastest(Tail, MaxTime, Solution).
 	
 getTimeAndCost([_ | []], Solution, Solution, Time, Cost, Time, Cost).
 getTimeAndCost([T1, T2 | Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), timeAndCost(T1, Distance, Time1, Cost1, Mode),
@@ -66,13 +70,20 @@ findFirst(S, Towns, Solution, Distance, Time, Cost) :- setof([Sol, D, T, C], gen
 	findFirst(Set,[Solution, Distance, Time, Cost]).
 findFirst([Solution | _], Solution).
 
-%Prints [[car, a], [plane, b]] as "car to a \n plane to b".
+%Prints [a, car, b] as 'a car b'.
 print([]).
 print([H | T]) :- write(H), write(' '), print(T).
 
-q1 :- findFirst(s, [b, c, e], Solution, Distance, Time, Cost), Time < 15, printTrip(Solution, Distance, Time, Cost).
+%Question 1:
+tripMaxTime(S, Towns, MaxTime) :- generateFastest(S, Towns, Solution, Distance, Time, Cost, MaxTime), Time < MaxTime, printTrip(Solution, Distance, Time, Cost).
+q1 :- tripMaxTime(s, [a], 15).
+
+%Question 2:
+tripMaxCost(S, Towns, MaxCost) :- generateCheapest(S, Towns, Solution, Distance, Time, Cost, MaxCost), Cost < MaxCost, printTrip(Solution, Distance, Time, Cost).
+q2 :- tripMaxCost(s, [a,b,c,d,e,f,g], 2000).
 
 %Prints a path, its distance, time and cost.
-printTrip(Path, Distance, Time, Cost) :- print(Path), write('Total distance: '), write(Distance), write('km.'),
+printTrip([Path, _, _, _], Distance, Time, Cost) :- print(Path), write('s'), nl, write('Total distance: '), write(Distance), write('km.'),
 	nl, write('Total time: '), write(Time), write('h.'), nl, write('Total cost: $'), write(Cost), write('.').
+
 
