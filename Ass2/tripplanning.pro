@@ -25,3 +25,4 @@ edge(g,f,	800,	800,	600,	480,	320,	0,	1.600,	6.666,	8.00,	10.000,	160).
 
 %They amounts were calculated by km *cost/km or km* hrs/km (distance divided by time)
 %If someone wouldn't mind double checking the for the likeliness that  I have a typo, please delete this comment once you both have read and understood what I did
+
