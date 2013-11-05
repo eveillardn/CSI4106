@@ -17,10 +17,6 @@ edge(f, g, 800).
 route(A, B, Distance) :- edge(A, B, Distance).
 route(A, B, Distance) :- edge(B, A, Distance).
 
-%submember([Element, _], List) returns true if [Element, _] is a member of List.
-submember(X, [[_, Head] | _]) :- X = Head, !.
-submember(X, [_ | Tail]) :- submember(X, Tail).
-
 %Calculates the time and cost when travelling a Distance from Town.
 timeAndCost(_, Distance, Time, Cost, plane) :- Distance >= 400,
 	Time is Distance / 500, Cost is Distance.
@@ -31,12 +27,11 @@ timeAndCost(_, Distance, Time, Cost, car) :- Time is Distance / 100, Cost is 0.6
 timeAndCost(_, Distance, Time, Cost, walk) :- Time is Distance / 5, Cost is 0.
 
 %Makes a trip from town A to town B while saving the visited towns (path) and the total distance.
-trip(A, B, Path, [[Mode, B] | Path], Distance, Time, Cost) :-
-	route(A, B, Distance), timeAndCost(A, Distance, Time, Cost, Mode).
-trip(A, B, PreviousPath, NewPath, Distance, Time, Cost) :-
-	route(A, C, D1), B \= C, \+(submember(C, PreviousPath)), timeAndCost(A, D1, T1, C1, M1),
-	trip(C, B, [[M1, C] | PreviousPath], NewPath, D2, T2, C2), timeAndCost(C, D2, T2, C2, _),
-	Distance is D1 + D2, Time is T1 + T2, Cost is C1 + C2.
+trip(A, B, Path, [B | Path], Distance) :-
+	route(A, B, Distance).
+trip(A, B, PreviousPath, NewPath, Distance) :-
+	route(A, C, D1), B \= C, \+(member(C, PreviousPath)), 
+	trip(C, B, [C | PreviousPath], NewPath, D2), Distance is D1 + D2.
 
 %Reverses a list. reverse([a, b, c], L): L = [c, b, a].
 reverseList(List, ReversedList) :- reverseList(List, [], ReversedList).
@@ -45,49 +40,39 @@ reverseList([H | T], Accumulator, ReversedList) :-
 	reverseList(T, [H | Accumulator], ReversedList).
 
 %Finds a path from town A to town B.
-findPath(A, B, Path, Distance, Time, Cost) :-
-	trip(A, B, [[start, A]], ReversedPath, Distance, Time, Cost), reverseList(ReversedPath, Path).
+findPath(A, B, Path, Distance) :-
+	trip(A, B, [A], ReversedPath, Distance), reverseList(ReversedPath, Path).
 
 %Appends the second list to the first list.
 append([], L, L).
 append([H | T], L2, [H | L]) :- append(T, L2, L).
 
+generate(S, Towns, Solution, Distance, Time, Cost) :- findPath(S, S, Path, Distance), submember(Towns, Path), getTimeAndCost(Path, [], S1, 0, 0, Time, Cost),
+	setof([S1, Distance, T1, C1], getTimeAndCost(Path, [], S1, 0, 0, T1, C1), Set), fastest(Set, Solution).
+fastest([H | T], Solution) :- fastest(T, H, Solution).
+fastest([[S1, D1, T1, C1] | T], [_, _, FastestTime, _], Solution) :- T1 < FastestTime, !, fastest(T, [S1, D1, T1, C1], Solution).
+fastest([_ | T], Fastest, Solution) :- fastest(T, Fastest, Solution).
+fastest([], Solution, Solution).
+	
+getTimeAndCost([_ | []], Solution, Solution, Time, Cost, Time, Cost).
+getTimeAndCost([T1, T2 | Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), timeAndCost(T1, Distance, Time1, Cost1, Mode),
+	append(TempSolution, [T1, Mode], Sol2), append([T2], Tail, Path2), TempTime2 is TempTime + Time1, TempCost2 is TempCost + Cost1,
+	getTimeAndCost(Path2, Sol2, Solution, TempTime2, TempCost2, Time, Cost).
+
+submember([], _).
+submember([H | T], L2) :- member(H, L2), !, submember(T, L2).
+
+findFirst(S, Towns, Solution, Distance, Time, Cost) :- setof([Sol, D, T, C], generate(S, Towns, Sol, D, T, C), Set),
+	findFirst(Set,[Solution, Distance, Time, Cost]).
+findFirst([Solution | _], Solution).
+
 %Prints [[car, a], [plane, b]] as "car to a \n plane to b".
 print([]).
-print([[Mode, Town] | Q]) :- write(Mode), write(' to '), write(Town), nl, print(Q).
+print([H | T]) :- write(H), write(' '), print(T).
+
+q1 :- findFirst(s, [b, c, e], Solution, Distance, Time, Cost), Time < 15, printTrip(Solution, Distance, Time, Cost).
 
 %Prints a path, its distance, time and cost.
 printTrip(Path, Distance, Time, Cost) :- print(Path), write('Total distance: '), write(Distance), write('km.'),
 	nl, write('Total time: '), write(Time), write('h.'), nl, write('Total cost: $'), write(Cost), write('.').
 
-%Finds a fastest path from town A to town B.
-fastest(A, B, Path, Distance, Time, Cost) :- setof([P1, D1, T1, C1], findPath(A, B, P1, D1, T1, C1), Set),
-	fastest(Set, [error, -1, 15, -1], [Path, Distance, Time, Cost]).
-fastest([], [Path, Distance, Time, Cost], [Path, Distance, Time, Cost]) :- Time < 15.
-fastest([[Path, Distance, Time, Cost] | Tail], [_, _, FastestTime, _], Fastest) :-
-	Time < FastestTime, submember(b, Path), submember(e, Path), submember(c, Path), !, 
-	fastest(Tail, [Path, Distance, Time, Cost], Fastest).
-fastest([_ | Tail], FastestTime, Fastest) :- fastest(Tail, FastestTime, Fastest).
-
-%Finds a fastest trip from A to A under 15h going to B, E and C
-fastestTrip(A, Path, Distance, Time, Cost) :- fastest(A, A, Path, Distance, Time, Cost),
-	printTrip(Path, Distance, Time, Cost).
-
-%Finds a shortest path from town A to town B.
-shortest(A, B, Path, Distance, Time, Cost) :- setof([P1, D1, T1, C1], findPath(A, B, P1, D1, T1, C1), Set),
-	shortest(Set, [Path, Distance, Time, Cost]).
-shortest([H | T], Shortest) :- shortest(T, H, Shortest).
-shortest([], Shortest, Shortest).
-shortest([[Path, Distance, Time, Cost] | Tail], [_, ShortestDistance, _, _], Shortest) :-
-	Distance < ShortestDistance, !, shortest(Tail, [Path, Distance, Time, Cost], Shortest).
-shortest([_ | Tail], ShortestDistance, Shortest) :- shortest(Tail, ShortestDistance, Shortest).
-
-%Finds a shortest trip from A to B and back to A.
-shortestTrip(A, B) :- shortest(A, B, P1, D1, T1, C1),
-	shortest(B, A, [_ | P2], D2, T2, C2), append(P1, P2, Path), Distance is D1 + D2,
-	Time is T1 + T2, Cost is C1 + C2, printTrip(Path, Distance, Time, Cost).
-
-%Should generate all possibilities but does not (s a b c g f e d s) not present.
-test(A, B) :- setof([P1, D1, T1, C1], findPath(A, B, P1, D1, T1, C1), Set), tPrint(Set).
-tPrint([]).
-tPrint([H | T]) :- write(H), nl, tPrint(T).
