@@ -49,22 +49,22 @@ append([H | T], L2, [H | L]) :- append(T, L2, L).
 
 generate(S, Towns, Solution, Distance, Time, Cost) :- findPath(S, S, Path, Distance), submember(Towns, Path), getTimeAndCost(Path, [], S1, 0, 0, Time, Cost),
 	setof([S1, Distance, T1, C1], getTimeAndCost(Path, [], S1, 0, 0, T1, C1), Set), fastest(Set, Solution).
-fastest([H | T], Solution) :- fastest(T, H, Solution).
-fastest([[S1, D1, T1, C1] | T], [_, _, FastestTime, _], Solution) :- T1 < FastestTime, !, fastest(T, [S1, D1, T1, C1], Solution).
-fastest([_ | T], Fastest, Solution) :- fastest(T, Fastest, Solution).
+fastest([H | T], Solution) :- fastest(T, H, Solution).
+fastest([[S1, D1, T1, C1] | T], [_, _, FastestTime, _], Solution) :- T1 < FastestTime, !, fastest(T, [S1, D1, T1, C1], Solution).
+fastest([_ | T], Fastest, Solution) :- fastest(T, Fastest, Solution).
 fastest([], Solution, Solution).
 	
-getTimeAndCost([_ | []], Solution, Solution, Time, Cost, Time, Cost).
-getTimeAndCost([T1, T2 | Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), timeAndCost(T1, Distance, Time1, Cost1, Mode),
+getTimeAndCost([_ | []], Solution, Solution, Time, Cost, Time, Cost).
+getTimeAndCost([T1, T2 | Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), timeAndCost(T1, Distance, Time1, Cost1, Mode),
 	append(TempSolution, [T1, Mode], Sol2), append([T2], Tail, Path2), TempTime2 is TempTime + Time1, TempCost2 is TempCost + Cost1,
 	getTimeAndCost(Path2, Sol2, Solution, TempTime2, TempCost2, Time, Cost).
 
 submember([], _).
-submember([H | T], L2) :- member(H, L2), !, submember(T, L2).
+submember([H | T], L2) :- member(H, L2), !, submember(T, L2).
 
 findFirst(S, Towns, Solution, Distance, Time, Cost) :- setof([Sol, D, T, C], generate(S, Towns, Sol, D, T, C), Set),
 	findFirst(Set,[Solution, Distance, Time, Cost]).
-findFirst([Solution | _], Solution).
+findFirst([Solution | _], Solution).
 
 %Prints [[car, a], [plane, b]] as "car to a \n plane to b".
 print([]).
