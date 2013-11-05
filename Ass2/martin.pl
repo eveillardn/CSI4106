@@ -62,10 +62,10 @@ printTrip(Path, Distance, Time, Cost) :- print(Path), write('Total distance: '),
 
 %Finds a fastest path from town A to town B.
 fastest(A, B, Path, Distance, Time, Cost) :- setof([P1, D1, T1, C1], findPath(A, B, P1, D1, T1, C1), Set),
-	fastest(Set, [error, -1, 15.01, -1], [Path, Distance, Time, Cost]).
-fastest([], [Path, Distance, Time, Cost], [Path, Distance, Time, Cost]) :- Path \= error.
-fastest([[Path, Distance, Time, Cost] | Tail], [_, FastestTime, _, _], Fastest) :-
-	Time < FastestTime, submember(b, Path), submember(e, Path), submember(c, Path), !,
+	fastest(Set, [error, -1, 15, -1], [Path, Distance, Time, Cost]).
+fastest([], [Path, Distance, Time, Cost], [Path, Distance, Time, Cost]) :- Time < 15.
+fastest([[Path, Distance, Time, Cost] | Tail], [_, _, FastestTime, _], Fastest) :-
+	Time < FastestTime, submember(b, Path), submember(e, Path), submember(c, Path), !, 
 	fastest(Tail, [Path, Distance, Time, Cost], Fastest).
 fastest([_ | Tail], FastestTime, Fastest) :- fastest(Tail, FastestTime, Fastest).
 
@@ -83,6 +83,11 @@ shortest([[Path, Distance, Time, Cost] | Tail], [_, ShortestDistance, _, _], Sho
 shortest([_ | Tail], ShortestDistance, Shortest) :- shortest(Tail, ShortestDistance, Shortest).
 
 %Finds a shortest trip from A to B and back to A.
-shortestTrip(A, B, Path, Distance, Time, Cost) :- shortest(A, B, P1, D1, T1, C1),
+shortestTrip(A, B) :- shortest(A, B, P1, D1, T1, C1),
 	shortest(B, A, [_ | P2], D2, T2, C2), append(P1, P2, Path), Distance is D1 + D2,
 	Time is T1 + T2, Cost is C1 + C2, printTrip(Path, Distance, Time, Cost).
+
+%Should generate all possibilities but does not (s a b c g f e d s) not present.
+test(A, B) :- setof([P1, D1, T1, C1], findPath(A, B, P1, D1, T1, C1), Set), tPrint(Set).
+tPrint([]).
+tPrint([H | T]) :- write(H), nl, tPrint(T).
