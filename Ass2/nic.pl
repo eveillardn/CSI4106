@@ -39,5 +39,29 @@ reverseList([H | T], Accumulator, ReversedList) :-
 findPath(A, B, Path, Distance) :-
 	trip(A, B, [A], ReversedPath, Distance), reverseList(ReversedPath, Path).
 	
-%Answer question 3. Build a set of solutions and return element going from Start to End in the shortest distance
-q3(Start,End):- setof([D,A],findPath(Start,End,A,D),[Solution|_]), print(Solution).
+%Path solver includes round trip from s to s every time
+pathSolver(S, Towns, Path, Distance) :- 
+	findPath(S, S, Path, Distance), submember(Towns, Path).
+	
+submember([], _).
+submember([H | T], L2) :- member(H, L2), !, submember(T, L2).
+	
+%Appends the second list to the first list.
+append([], L, L).
+append([H | T], L2, [H | L]) :- append(T, L2, L).
+	
+%Answer question 3. Build a set of solutions and return element going from Start to Start while including Including nodes in the shortest distance
+q3(Start,Including):- setof([D,A],pathSolver(Start,Including,A,D),[Solution|_]), print(Solution).
+
+
+
+
+
+
+%Testing to see if an infitite amount of solutions are created when going from starting node to ending node
+infinitTest(Start,End):- setof([D,A],findPath(Start,End,A,D),Set), printAll(Set).
+
+printAll([]).
+printAll([H|T]) :-
+	print(H),nl,
+	printAll(T).
