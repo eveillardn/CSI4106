@@ -1,5 +1,3 @@
-%Martin version - WIP
-
 %edge(town1, town2, distance).
 edge(s, a, 300).
 edge(s, d, 20).
@@ -108,12 +106,17 @@ findPath(A, B, Path, Distance,Towns) :-
 append([], L, L).
 append([H | T], L2, [H | L]) :- append(T, L2, L).
 
+%Checks if every element of the first list is in the second list.
 submember([], _).
 submember([H | T], L2) :- member(H, L2), !, submember(T, L2).
 
 %Prints [a, car, b] as 'a car b'.
 print([]).
 print([H | T]) :- write(H), write(' '), print(T).
+
+%Prints a path, its distance, time and cost.
+printTrip(Path, Distance, Time, Cost) :- print(Path), write('s'), nl, write('Total distance: '), write(Distance), write('km.'),
+	nl, write('Total time: '), write(Time), write('h.'), nl, write('Total cost: $'), write(Cost), write('.').
 
 %Question 1: 
 q1:-
@@ -131,12 +134,3 @@ q2:-
 q3:-
 	setof([Solution,Distance,Time,Cost],generateQuick(s,[c],Solution,Distance,Time,Cost),[[S,D,T,C]|_]),
 	printTrip(S,D,T,C).
-	
-%SanityTest This path should be at max either [s,a,d,s] or [s,d,a,s]
-test1:-
-	setof([Solution,Distance,Time,Cost],generateQuick(s,[a],Solution,Distance,Time,Cost),[[S,D,T,C]|_]),
-	printTrip(S,D,T,C).
-
-%Prints a path, its distance, time and cost.
-printTrip(Path, Distance, Time, Cost) :- print(Path), write('s'), nl, write('Total distance: '), write(Distance), write('km.'),
-	nl, write('Total time: '), write(Time), write('h.'), nl, write('Total cost: $'), write(Cost), write('.').
