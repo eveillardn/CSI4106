@@ -19,34 +19,34 @@ route(A, B, Distance) :- edge(B, A, Distance).
 
 %Calculates the time and cost when travelling a Distance from Town.
 answerTimeAndCost(Time,Cost,Time,Cost).
-timeAndCost(Distance, Time, Cost, plane) :- Distance >= 400,
+timeAndCost(_, Distance, Time, Cost, plane) :- Distance >= 400,
 	Time2 is Distance / 500, Cost2 is Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
-timeAndCost(Distance, Time, Cost, train) :- Time2 is Distance / 120, Cost2 is 0.75 * Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
-timeAndCost(Distance, Time, Cost, bus) :- Town \= a, Town \= e, Town \= f, Time2 is Distance / 80, Cost2 is 0.40 * Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
-timeAndCost(Distance, Time, Cost, car) :- Time2 is Distance / 100, Cost2 is 0.60 * Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
-timeAndCost(Distance, Time, Cost, walk) :- Time2 is Distance / 5, Cost2 is 0, answerTimeAndCost(Time,Cost,Time2,Cost2).
+timeAndCost(_, Distance, Time, Cost, train) :- Time2 is Distance / 120, Cost2 is 0.75 * Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
+timeAndCost(Town, Distance, Time, Cost, bus) :- Town \= a, Town \= e, Town \= f, Time2 is Distance / 80, Cost2 is 0.40 * Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
+timeAndCost(_, Distance, Time, Cost, car) :- Time2 is Distance / 100, Cost2 is 0.60 * Distance, answerTimeAndCost(Time,Cost,Time2,Cost2).
+timeAndCost(_, Distance, Time, Cost, walk) :- Time2 is Distance / 5, Cost2 is 0, answerTimeAndCost(Time,Cost,Time2,Cost2).
 
 %Returns all possible Modes of transportations for this traveled Distance from given Town, along with their Cost, while sorted by Time
-quickTravel(Distance,Solution) :-
-	setof([Time,Cost,Mode],timeAndCost(Distance,Time,Cost,Mode),Solution).
+quickTravel(Town, Distance,Solution) :-
+	setof([Time,Cost,Mode],timeAndCost(Town, Distance,Time,Cost,Mode),Solution).
 %Only returns quickest possible movement
-quickestTravel(Distance,Time,Cost,Mode):- quickTravel(Distance,[[Time,Cost,Mode]|_]).
+quickestTravel(Town, Distance,Time,Cost,Mode):- quickTravel(Town, Distance,[[Time,Cost,Mode]|_]).
 
 %Returns all possible Modes of transportations for this traveled Distance from given Town, along with their Time, while sorted by Cost	
-cheapTravel(Distance,Solution) :-
-	setof([Cost,Time,Mode],timeAndCost(Distance,Time,Cost,Mode),Solution).
+cheapTravel(Town, Distance,Solution) :-
+	setof([Cost,Time,Mode],timeAndCost(Town, Distance,Time,Cost,Mode),Solution).
 %Only returns cheapest possible movement
-cheapestTravel(Distance,Time,Cost,Mode):- cheapTravel(Distance,[[Cost,Time,Mode]|_]).
+cheapestTravel(Town, Distance,Time,Cost,Mode):- cheapTravel(Town, Distance,[[Cost,Time,Mode]|_]).
 	
 %Returns a Solution displaying traveled nodes with the mode of transportation, the total Time of this solution, and the total Cost of this solution. Emphasis is on the speed and doesn't account for cost.
 getQuickTimeAndCost([_ | []], Solution, Solution, Time, Cost, Time, Cost).
-getQuickTimeAndCost([T1, T2 | Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), quickestTravel(Distance, Time1, Cost1, Mode),
+getQuickTimeAndCost([T1, T2 | Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), quickestTravel(T1, Distance, Time1, Cost1, Mode),
 	append(TempSolution, [T1, Mode], Sol2), append([T2], Tail, Path2), TempTime2 is TempTime + Time1, TempCost2 is TempCost + Cost1,
 	getQuickTimeAndCost(Path2, Sol2, Solution, TempTime2, TempCost2, Time, Cost).
 
 %Returns a Solution displaying traveled nodes with the mode of transportation, the total Time of this solution, and the total Cost of this solution. Emphasis is on the cost and doesn't account for speed.	
 getCheapTimeAndCost([_ | []], Solution, Solution, Time, Cost, Time, Cost).
-getCheapTimeAndCost([T1, T2 |Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), cheapestTravel(Distance, Time1, Cost1, Mode),
+getCheapTimeAndCost([T1, T2 |Tail], TempSolution, Solution, TempTime, TempCost, Time, Cost) :- route(T1, T2, Distance), cheapestTravel(T1, Distance, Time1, Cost1, Mode),
 	append(TempSolution, [T1, Mode], Sol2), append([T2], Tail, Path2), TempTime2 is TempTime + Time1, TempCost2 is TempCost + Cost1,
 	getCheapTimeAndCost(Path2, Sol2, Solution, TempTime2, TempCost2, Time, Cost).
 	
